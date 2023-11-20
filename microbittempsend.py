@@ -19,11 +19,11 @@ def find_comport(pid, vid, baud):
     ser_port = serial.Serial(timeout=TIMEOUT)
     ser_port.baudrate = baud
     ports = list(list_ports.comports())
-    #print('scanning ports')
+    print('scanning ports')
     for p in ports:
         if (p.pid == pid) and (p.vid == vid):
-            #print('found target device pid: {} vid: {} port: {}'.format(
-            #    p.pid, p.vid, p.device))
+            print('found target device pid: {} vid: {} port: {}'.format(
+                p.pid, p.vid, p.device))
             ser_port.port = str(p.device)
             return ser_port
     return None
@@ -37,7 +37,6 @@ if not ser_micro:
 else:    
     ser_micro.open()
     source = "Home"
-    i = 0
     ref = db.reference().child('temp_log')
     while True:
         data = str(ser_micro.readline().decode('utf-8'))
@@ -46,7 +45,6 @@ else:
         print(data)
         if data.isdigit():
             ref.update({str(int(time.time())):{'Tempature':data, 'Location':source}})
-            i = i + 1
         else:
             print("Check data source")
-        time.sleep(5)
+        #time.sleep(5)

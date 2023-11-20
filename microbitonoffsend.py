@@ -19,11 +19,11 @@ def find_comport(pid, vid, baud):
     ser_port = serial.Serial(timeout=TIMEOUT)
     ser_port.baudrate = baud
     ports = list(list_ports.comports())
-    #print('scanning ports')
+    print('scanning ports')
     for p in ports:
         if (p.pid == pid) and (p.vid == vid):
-            #print('found target device pid: {} vid: {} port: {}'.format(
-            #    p.pid, p.vid, p.device))
+            print('found target device pid: {} vid: {} port: {}'.format(
+                p.pid, p.vid, p.device))
             ser_port.port = str(p.device)
             return ser_port
     return None
@@ -37,16 +37,21 @@ if not ser_micro:
 else:    
     ser_micro.open()
     source = "Home"
-    i = 0
-    ref = db.reference().child('temp_log')
+    ref = db.reference().child('light_log')
     while True:
         data = str(ser_micro.readline().decode('utf-8'))
         data = data.replace(" ","")
         data = data.replace("\r\n","")
-        print(data)
-        if data.isdigit():
-            ref.update({str(int(time.time())):{'Tempature':data, 'Location':source}})
-            i = i + 1
-        else:
-            print("Check data source")
-        time.sleep(5)
+        if (data == "1"):
+            data = "On"
+        elif(data == "0"):
+            data = "Off"
+        #else:
+            #print("Error")  
+        #print(data)
+        if data.isalpha():
+            print(data)
+            ref.update({str(int(time.time())):{'On or Off':data, 'Location':source}})
+        #else:
+            #print("No data :(")
+        #time.sleep(0.1)
